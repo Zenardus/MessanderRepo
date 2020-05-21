@@ -1,0 +1,21 @@
+﻿<Window x:Class="Client.AuthorizationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Client"
+        mc:Ignorable="d"
+        Title="AuthorizationWindow" Height="350" Width="280" WindowStartupLocation="CenterScreen">
+    <Grid >
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="80"/>
+        </Grid.RowDefinitions>
+        <Frame Name="frame" NavigationUIVisibility="Hidden">
+            
+        </Frame>
+        <Button x:Name="button_authorize" Grid.Row="1" Content="Login" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" Click="button_authorize_Click"/>
+        <Label x:Name="label_link" Grid.Row="2" Content="register" HorizontalAlignment="Center" Foreground="Blue" Cursor="Hand" VerticalAlignment="Top" MouseDown="label_link_MouseDown"/>
+    </Grid>
+</Window>

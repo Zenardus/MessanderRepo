@@ -1,0 +1,15 @@
+﻿<UserControl x:Class="Client.MyControls.MessageControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Client.MyControls"
+             mc:Ignorable="d" 
+             MinWidth="95">
+    <Grid>
+        <Rectangle  Fill="DarkViolet" RadiusX="25" RadiusY="25"/>
+        <TextBlock Name="textBlock_Message" Padding="15 10 15 15" Foreground="WhiteSmoke" Text="Test"/>
+        <TextBlock Name="textBlock_Time" Text="17:15" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="17 0" Foreground="Black" FontSize="11"/>
+    </Grid>
+    <!--d:DesignHeight="150" d:DesignWidth="150"-->
+</UserControl>

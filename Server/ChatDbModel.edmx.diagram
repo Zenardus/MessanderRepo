@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="88940652ab5945bcbba507310c03027d" Name="Diagram1">
+        <EntityTypeShape EntityType="chatDBModel.FriendRequest" Width="1.5" PointX="3" PointY="4.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="chatDBModel.Friends" Width="1.5" PointX="3" PointY="7.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="chatDBModel.GroupMembers" Width="1.5" PointX="3" PointY="10.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="chatDBModel.GroupMessages" Width="1.5" PointX="6" PointY="7.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="chatDBModel.Groups" Width="1.5" PointX="3.75" PointY="1.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="chatDBModel.Messages" Width="1.5" PointX="3" PointY="15.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="chatDBModel.User" Width="1.5" PointX="0.75" PointY="6.75" IsExpanded="true" />
+        <AssociationConnector Association="chatDBModel.FK_FriendRequestFrom_User" ManuallyRouted="false" />
+        <AssociationConnector Association="chatDBModel.FK_FriendRequestTo_User" ManuallyRouted="false" />
+        <AssociationConnector Association="chatDBModel.FK_Friend_User" ManuallyRouted="false" />
+        <AssociationConnector Association="chatDBModel.FK_User_User" ManuallyRouted="false" />
+        <AssociationConnector Association="chatDBModel.FK_GroupMembers_Group" ManuallyRouted="false" />
+        <AssociationConnector Association="chatDBModel.FK_GroupMembers_User" ManuallyRouted="false" />
+        <AssociationConnector Association="chatDBModel.FK_GroupMessages_Group" ManuallyRouted="false" />
+        <AssociationConnector Association="chatDBModel.FK_GroupMessages_User" ManuallyRouted="false" />
+        <AssociationConnector Association="chatDBModel.FK_From_User" ManuallyRouted="false" />
+        <AssociationConnector Association="chatDBModel.FK_To_Messages" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

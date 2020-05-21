@@ -1,0 +1,38 @@
+﻿<Page x:Class="Client.MessagesPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Client"
+      mc:Ignorable="d" 
+      d:DesignHeight="300" d:DesignWidth="300"
+      Title="MessagesPage">
+    <Page.CommandBindings>
+        <CommandBinding Command="local:MyCommands.ButtonEnabled" CanExecute="CommandBinding_CanExecute"/>
+    </Page.CommandBindings>
+
+    <Grid  Style="{StaticResource ResourceKey=style}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition/>
+            <RowDefinition Height="65"/>
+        </Grid.RowDefinitions>
+        <Label Name="label_user" Foreground="WhiteSmoke" Content="Zenardus" HorizontalAlignment="Center" FontWeight="ExtraBold" FontSize="13"/>
+        <ListBox Name="listBox_messages" BorderBrush="#FF2D3FB9" Grid.Row="1" HorizontalContentAlignment="Stretch" Background="{StaticResource BackPrimary}"/>
+        <Grid Grid.Row="2" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="60"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Name="textBox_message" BorderThickness="0" Foreground="WhiteSmoke"  Margin="0,9,0,9" AcceptsReturn="True" Background="{StaticResource  BackPrimary}"/>
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="25"/>
+                </Grid.RowDefinitions>
+                <Button Name="button_send" Grid.Column="1" Margin="0 9 0 0" Content="Send" Click="button_send_Click" Template="{StaticResource buttonTemplate}" Command="local:MyCommands.ButtonEnabled"/>
+                <Button Name="button_attachment" Grid.Row="1" Margin="0 0 0 9" Content="attachment" FontSize="8" Padding="-7" Template="{StaticResource buttonTemplate}"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>

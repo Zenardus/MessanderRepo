@@ -1,0 +1,59 @@
+﻿<Window x:Class="Client.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Client"
+        mc:Ignorable="d"
+        Title="Zenardus chat" Height="450" Width="725" Closing="Window_Closing" WindowStartupLocation="CenterScreen">
+    
+    <Grid  Style="{DynamicResource ResourceKey=style}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="28"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Label Name="label_nickname"  HorizontalAlignment="Center" VerticalAlignment="Center" Content="Zenardus" Foreground="#FF86469E" FontFamily="Arial" FontWeight="Bold" />
+            <TextBox Name="textBox_notification" Grid.Column="1" Background="{StaticResource BackMain}" Foreground="Transparent" BorderThickness="0" IsReadOnly="True" HorizontalContentAlignment="Center">
+                <TextBox.Style>
+                    <Style>
+                        <Style.Triggers>
+                            <EventTrigger RoutedEvent="TextBox.TextChanged">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetProperty="Foreground.Color" To="White" Duration="0:0:4" />
+                                        <ColorAnimation Storyboard.TargetProperty="Foreground.Color" To="Transparent" Duration="0:0:4"/>
+
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
+        </Grid>
+        
+        <Grid Grid.Row="1" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <StackPanel >
+                <Button Name="button_messages" Height="35" Margin="0,30,0,0" Click="button_messages_Click" Template="{StaticResource buttonTemplate}">messages</Button>
+                <Button Name="button_groups" Height="35" Click="button_groups_Click" Template="{StaticResource buttonTemplate}">groups</Button>
+                <Button Name="button_friends" Height="35" Click="button_friends_Click" Template="{StaticResource buttonTemplate}">friends</Button>
+                <Button Name="button_requests" Height="35" Click="button_requests_Click" Template="{StaticResource buttonTemplate}">requests</Button>
+                <Button Name="button_addFriends" Height="35" Click="button_addFriends_Click" Template="{StaticResource buttonTemplate}">add friend</Button>
+            </StackPanel>
+            <Frame Name="frame" Grid.Column="1"  NavigationUIVisibility="Hidden" Background="{DynamicResource ResourceKey=BackPrimary}">
+                <!--<Frame.Content>
+                    <local:AddFriendPage x:Name="messagesPage"/>
+                </Frame.Content>-->
+            </Frame>
+        </Grid>
+    </Grid>
+</Window>

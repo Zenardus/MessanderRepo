@@ -1,0 +1,31 @@
+﻿<Page x:Class="Client.FriendsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Client"
+      mc:Ignorable="d" 
+      d:DesignHeight="300" d:DesignWidth="450"
+      Title="FriendsPage">
+    <Page.CommandBindings>
+        <CommandBinding Command="local:MyCommands.ButtonEnabled" CanExecute="CommandBinding_CanExecute"/>
+    </Page.CommandBindings>
+    <Grid Style="{StaticResource style}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Label Content="Friends" Foreground="WhiteSmoke" Margin="0,0,120,0" HorizontalAlignment="Center" FontWeight="ExtraBold" FontSize="13"/>
+        <Grid Grid.Row="1" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="120"/>
+            </Grid.ColumnDefinitions>
+            <ListBox Name="listBox_friends" BorderBrush="#FF2D3FB9" Padding="-3" HorizontalContentAlignment="Stretch" Background="{StaticResource BackPrimary}"/>
+            <StackPanel Grid.Column="1">
+                <Button Name="button_write" Content="Написати" Click="button_write_Click" Template="{StaticResource buttonTemplate}" Height="27" Command="local:MyCommands.ButtonEnabled"/>
+                <Button Name="button_delete" Content="Видалити" Click="Button_DeleteClick" Template="{StaticResource buttonTemplate}" Height="27" Command="local:MyCommands.ButtonEnabled"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>
