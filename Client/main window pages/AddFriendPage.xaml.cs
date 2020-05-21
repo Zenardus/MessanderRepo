@@ -93,7 +93,7 @@ namespace Client
 
         private void listBox_users_LostFocus(object sender, RoutedEventArgs e)
         {
-            this.listBox_users.UnselectAll();
+            //this.listBox_users.UnselectAll();
         }
     }
 }

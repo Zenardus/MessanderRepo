@@ -9,7 +9,7 @@
       Title="RequestsPage">
 
     <Page.CommandBindings>
-        <CommandBinding Command="local:MyCommands.ButtonEnabled"/>
+        <CommandBinding Command="local:MyCommands.ButtonEnabled" CanExecute="CommandBinding_CanExecute"/>
     </Page.CommandBindings>
     
     <Grid Style="{StaticResource style}">
@@ -25,8 +25,8 @@
             </Grid.ColumnDefinitions>
             <ListBox Name="listBox_users" Padding="-3" BorderBrush="#FF2D3FB9" HorizontalContentAlignment="Stretch" Background="{StaticResource BackPrimary}"/>
             <StackPanel Grid.Column="1">
-                <Button Content="Accept" Height="27" Template="{StaticResource buttonTemplate}" Command="local:MyCommands.ButtonEnabled"/>
-                <Button Content="Decline" Height="27" Template="{StaticResource buttonTemplate}" Command="local:MyCommands.ButtonEnabled"/>
+                <Button Name="button_accept" Content="Accept" Height="27" Template="{StaticResource buttonTemplate}" Command="local:MyCommands.ButtonEnabled" Click="button_accept_Click"/>
+                <Button Name="button_decline" Content="Decline" Height="27" Template="{StaticResource buttonTemplate}" Command="local:MyCommands.ButtonEnabled" Click="button_decline_Click"/>
             </StackPanel>
         </Grid>
         

@@ -70,7 +70,7 @@ namespace Client
                     addFriend = new AddFriendPage(stream, login);
                     groupsList = new GroupsPage(stream, login);
                     messagesList = new MessagesList(stream, login);
-                    requests = new RequestsPage();
+                    requests = new RequestsPage(stream, login);
 
                     createGroupWindow = new CreateGroupWindow(stream, login);
 
@@ -131,6 +131,11 @@ namespace Client
         private void button_requests_Click(object sender, RoutedEventArgs e)
         {
             frame.NavigationService.Navigate(requests);
+
+            Instruction instruction = new Instruction(Operation.GetFriendRequests, login, null, null);
+            byte[] data = MyObjectConverter.ObjectToByteArray(instruction);
+            stream.WriteAsync(data, 0, data.Length);
+
             currentPage = CurrentPage.None;
         }
         private void button_addFriends_Click(object sender, RoutedEventArgs e)
@@ -228,6 +233,12 @@ namespace Client
                 case Operation.ReceiveGroupMessage:
                     GroupMessage(instruction);
                     break;
+                case Operation.FriendRequest:
+                    FriendRequest(instruction);
+                    break;
+                case Operation.GetFriendRequests:
+                    GetFriendRequests(instruction);
+                    break;
             }
         }
         private void SearchedUser(Instruction instr)
@@ -244,10 +255,9 @@ namespace Client
             //    MessageBox.Show(instr.From);
             //}
         }
-        //<<
         private void Friends(Instruction instr)
         {
-            //friends.SetList(instr.Data as List<UserData>);
+            friends.SetList(instr.Data as List<UserData>);
         }
         //<<
         private void GetMessages(Instruction instr)
@@ -349,6 +359,18 @@ namespace Client
             //    }));
             //}
 
+        }
+        private void FriendRequest(Instruction instr)
+        {
+            textBox_notification.Dispatcher.Invoke(new Action(() =>
+            {
+                textBox_notification.Clear();
+                textBox_notification.Text = instr.From;
+            }));
+        }
+        private void GetFriendRequests(Instruction instr)
+        {
+            requests.SetList(instr.Data as List<UserData>);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

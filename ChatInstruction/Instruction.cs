@@ -28,7 +28,9 @@ namespace ChatInstruction
         Login,         //+
         Register,      //+
         AddOnline,     //+
-        SearchUser     //+
+        SearchUser,     //+
+        GetFriendRequests,
+        RequestResult
     }
     //OPERATIONS:
     //        SERVER RECEIVE                               CLIENT RECEIVE

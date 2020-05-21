@@ -168,6 +168,15 @@ namespace Server
                 case Operation.GroupMessage:
                     GroupMessage(instruction);
                     break;
+                case Operation.FriendRequest:
+                    FriendRequest(instruction.From, instruction.To, stream);
+                    break;
+                case Operation.GetFriendRequests:
+                    GetFriendsRequests(instruction.From, stream);
+                    break;
+                case Operation.RequestResult:
+                    RequestResult(instruction, stream);
+                    break;
             }
             
         }
@@ -285,36 +294,40 @@ namespace Server
             //stream.WriteAsync(data, 0, data.Length);
             //stream.WriteAsync(data, 0, data.Length);
         }
-        //<<
         private void Friends(string from, NetworkStream stream)
         {
-            //int userID = GetUserId(from);
+            int userID = GetUserId(from);
 
-            //List<Friends> tmp = db.Friends.Where(usr => usr.userID == userID).ToList();
-            //List<UserData> friends = new List<UserData>();
-            //foreach (var item in tmp)
-            //    friends.Add(new UserData(item.User.nickname, item.User.name, item.User.surname));
-            //Instruction instr = new Instruction(Operation.Friends, null, null, friends);
-            //byte[] data = MyObjectConverter.ObjectToByteArray(instr);
-            //stream.WriteAsync(data, 0, data.Length);
-            //stream.WriteAsync(data, 0, data.Length);
+            List<Friends> tmp = db.Friends.Where(usr => usr.userID == userID || usr.friendID == userID).ToList();
+            List<UserData> friends = new List<UserData>();
+            foreach (var item in tmp)
+            {
+                if (item.userID == userID)
+                    friends.Add(new UserData(item.User.nickname, item.User.name, item.User.surname));
+                else
+                    friends.Add(new UserData(item.User1.nickname, item.User1.name, item.User1.surname));
+
+            }
+            Instruction instr = new Instruction(Operation.Friends, null, null, friends);
+            byte[] data = MyObjectConverter.ObjectToByteArray(instr);
+            stream.WriteAsync(data, 0, data.Length);
+            stream.WriteAsync(data, 0, data.Length);
         }
-        //<<
         private void DeleteFriend(string from, string to)
         {
-            //int userID = GetUserId(from);
-            //int friendID = GetUserId(to);
+            int userID = GetUserId(from);
+            int friendID = GetUserId(to);
 
-            //try
-            //{
-            //    List<Friends> friends = db.Friends.Where(usr => usr.userID == userID && usr.friendID == friendID).ToList();
-            //    db.Friends.RemoveRange(friends);
-            //    db.SaveChangesAsync();
-            //}
-            //catch (Exception)
-            //{
+            try
+            {
+                List<Friends> friends = db.Friends.Where(usr => (usr.userID == userID && usr.friendID == friendID) || (usr.userID == friendID && usr.friendID == userID)).ToList();
+                db.Friends.RemoveRange(friends);
+                db.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
 
-            //}
+            }
         }
         private void AddOnline(string from, NetworkStream stream)
         {
@@ -565,7 +578,95 @@ namespace Server
             //    }
             //}
         }
-        
+        private void FriendRequest(string from, string to, NetworkStream stream)
+        {
+            int fromID = GetUserId(from);
+            int toID = GetUserId(to);
+
+            Instruction instr;
+
+            if (fromID == -1 || toID == -1)
+            {
+                instr = new Instruction(Operation.FriendRequest, "Користувача не знайдено\nОновіть сторінку", null, false);
+            }
+            else
+            {
+                var tmp = db.FriendRequest.Where(item => (item.fromID == fromID && item.toID == toID) || (item.fromID == toID && item.toID == fromID)).ToList();
+                var tmp2 = db.Friends.Where(item => (item.friendID == fromID && item.userID == toID) || (item.friendID == toID && item.userID == fromID)).ToList();
+                if(tmp2.Count > 0)
+                {
+                    instr = new Instruction(Operation.FriendRequest, "Цей користувач уже є в списку ваших друзів", null, false);
+                }
+                else if (tmp.Count > 0)
+                {
+                    instr = new Instruction(Operation.FriendRequest, "Ви або цей користувач вже подали заявку в друзі", null, false);
+                }
+                else
+                {
+                    try
+                    {
+                        FriendRequest request = new FriendRequest()
+                        {
+                            fromID = GetUserId(from),
+                            toID = GetUserId(to)
+                        };
+                        db.FriendRequest.Add(request);
+                        db.SaveChangesAsync();
+
+                        instr = new Instruction(Operation.FriendRequest, "Запит в друзі надіслано", null, true);
+                    }
+                    catch (Exception e)
+                    {
+                        instr = new Instruction(Operation.FriendRequest, e.Message, null, false);
+                    }
+                }
+            }
+            byte[] data = MyObjectConverter.ObjectToByteArray(instr);
+            stream.WriteAsync(data, 0, data.Length);
+            stream.WriteAsync(data, 0, data.Length);
+        }
+        private void GetFriendsRequests(string from, NetworkStream stream)
+        {
+            int userID = GetUserId(from);
+
+            List<FriendRequest> tmp = db.FriendRequest.Where(usr =>  usr.toID == userID).ToList();
+            List<UserData> friends = new List<UserData>();
+            foreach (var item in tmp)
+                friends.Add(new UserData(item.User.nickname, item.User.name, item.User.surname));
+            Instruction instr = new Instruction(Operation.GetFriendRequests, null, null, friends);
+            byte[] data = MyObjectConverter.ObjectToByteArray(instr);
+            stream.WriteAsync(data, 0, data.Length);
+            stream.WriteAsync(data, 0, data.Length);
+        }
+        private void RequestResult(Instruction instr, NetworkStream stream)
+        {
+            int fromID = GetUserId(instr.From);
+            int toID = GetUserId(instr.To);
+
+            if ((bool)instr.Data)
+            {
+                db.FriendRequest.RemoveRange
+                    (
+                    db.FriendRequest.Where(req => (req.fromID == fromID && req.toID == toID) || (req.fromID == toID && req.toID == fromID))
+                    );
+                Friends friend = new Server.Friends
+                {
+                    userID = fromID,
+                    friendID = toID
+                };
+                db.Friends.Add(friend);
+                db.SaveChangesAsync();
+            }
+            else
+            {
+                db.FriendRequest.RemoveRange
+                    (
+                    db.FriendRequest.Where(req => (req.fromID == fromID && req.toID == toID) || (req.fromID == toID && req.toID == fromID))
+                    );
+                db.SaveChangesAsync();
+            }
+        }
+
         //DB GET METHODS
         private int GetUserId(string nickname)
         {
