@@ -49,7 +49,14 @@ namespace Client
 
                 if (message.Type == MessageType.TextMessage)
                 {
-                    MessageControl msg = new MessageControl((string)message.Message, message.Time.ToShortTimeString());
+                    MessageControl msg;
+                    if (isPersonalMessage)
+                        msg = new MessageControl((string)message.Message, message.Time.ToShortTimeString());
+                    else
+                    {
+                        string text = ((string)message.Message).Replace($"{from}:\n", "");
+                        msg = new MessageControl(text, message.Time.ToShortTimeString());
+                    }
                     msg.HorizontalAlignment = aligment;
                     msg.Margin = new Thickness(1);
                     listBox_messages.Items.Add(msg);
@@ -115,7 +122,6 @@ namespace Client
             if (isPersonalMessage)
             {
                 Instruction instr = new Instruction(Operation.PersonalMessage, from, label_user.Content.ToString(), message);
-                //AddMessage(message, System.Windows.HorizontalAlignment.Right);
                 textBox_message.Clear();
                 byte[] data = MyObjectConverter.ObjectToByteArray(instr);
                 stream.WriteAsync(data, 0, data.Length);
@@ -130,22 +136,15 @@ namespace Client
                 }
 
             }
-            //if (isPersonalMessage)
-            //{
-            //    Instruction instr = new Instruction(Operation.PersonalMessage, from, label_user.Content.ToString(), textBox_message.Text);
-            //    AddMessage(textBox_message.Text, HorizontalAlignment.Right);
-            //    textBox_message.Clear();
-            //    byte[] data = MyObjectConverter.ObjectToByteArray(instr);
-            //    stream.WriteAsync(data, 0, data.Length);
-            //}
-            //else
-            //{
-            //    Instruction instr = new Instruction(Operation.GroupMessage, from, groupID.ToString(), textBox_message.Text);
-            //    AddMessage(textBox_message.Text, HorizontalAlignment.Right);
-            //    textBox_message.Clear();
-            //    byte[] data = MyObjectConverter.ObjectToByteArray(instr);
-            //    stream.Write(data, 0, data.Length);
-            //}
+            else
+            {
+                Instruction instr = new Instruction(Operation.GroupMessage, from, groupID.ToString(), textBox_message.Text);
+                MessageData msg = new MessageData("none", "none", textBox_message.Text, DateTime.Now);
+                AddMessage(msg, System.Windows.HorizontalAlignment.Right);
+                textBox_message.Clear();
+                byte[] data = MyObjectConverter.ObjectToByteArray(instr);
+                stream.Write(data, 0, data.Length);
+            }
         }
 
         private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)

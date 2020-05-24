@@ -534,16 +534,19 @@ namespace Server
             stream.WriteAsync(d, 0, d.Length);
             stream.WriteAsync(d, 0, d.Length);
         }
-        //ДОРОБИТИ
         private void GroupsMembers(string from, NetworkStream stream)
         {
             int userID = GetUserId(from);
 
-            List<Friends> tmp = db.Friends.Where(usr => usr.userID == userID).ToList();
+            List<Friends> tmp = db.Friends.Where(usr => usr.userID == userID || usr.friendID == userID).ToList();
             List<UserData> friends = new List<UserData>();
             foreach (var item in tmp)
             {
-                friends.Add(new UserData(item.User.nickname, item.User.name, item.User.surname));
+                if (item.userID == userID)
+                    friends.Add(new UserData(item.User.nickname, item.User.name, item.User.surname));
+                else
+                    friends.Add(new UserData(item.User1.nickname, item.User1.name, item.User1.surname));
+
             }
             Instruction instr = new Instruction(Operation.GroupsMembers, null, null, friends);
             byte[] data = MyObjectConverter.ObjectToByteArray(instr);
@@ -573,55 +576,53 @@ namespace Server
 
             db.SaveChangesAsync();
         }
-        //<<
         private void GetMessageFromGroup(int groupID, NetworkStream stream)
         {
-            //List<GroupMessages> tmp = db.GroupMessages.Where(msg => msg.groupID == groupID).ToList();
-            //List<MessageData> messages = new List<MessageData>();
+            List<GroupMessages> tmp = db.GroupMessages.Where(msg => msg.groupID == groupID).ToList();
+            List<MessageData> messages = new List<MessageData>();
 
-            //foreach (var item in tmp)
-            //{
-            //    messages.Add(new MessageData(item.User.nickname, item.User.name, item.message, item.time));
-            //}
-            //Groups g = db.Groups.Where(gr => gr.id == groupID).First();
-            //Instruction instr = new Instruction(Operation.GetMessagesFromGroup, groupID.ToString(), g.name, messages);
-            //byte[] data = MyObjectConverter.ObjectToByteArray(instr);
-            //stream.WriteAsync(data, 0, data.Length);
-            //stream.WriteAsync(data, 0, data.Length);
+            foreach (var item in tmp)
+            {
+                messages.Add(new MessageData(item.User.nickname, item.User.name, $"{item.User.nickname}:\n{item.message}", item.time));
+            }
+            Groups g = db.Groups.Where(gr => gr.id == groupID).First();
+            Instruction instr = new Instruction(Operation.GetMessagesFromGroup, groupID.ToString(), g.name, messages);
+            byte[] data = MyObjectConverter.ObjectToByteArray(instr);
+            stream.WriteAsync(data, 0, data.Length);
+            stream.WriteAsync(data, 0, data.Length);
         }
-        //<<
         private async Task GroupMessage(Instruction instr)
         {
-            //GroupMessages msg = new GroupMessages();
-            //msg.groupID = int.Parse(instr.To);
-            //msg.fromID = GetUserId(instr.From);
-            //msg.message = (string)instr.Data;
-            //msg.time = DateTime.Now;
+            GroupMessages msg = new GroupMessages();
+            msg.groupID = int.Parse(instr.To);
+            msg.fromID = GetUserId(instr.From);
+            msg.message = (string)instr.Data;
+            msg.time = DateTime.Now;
 
-            //db.GroupMessages.Add(msg);
-            //await db.SaveChangesAsync();
+            db.GroupMessages.Add(msg);
+            await db.SaveChangesAsync();
 
-            //int id = int.Parse(instr.To);
-            //int fromId = GetUserId(instr.From);
+            int id = int.Parse(instr.To);
+            int fromId = GetUserId(instr.From);
 
-            //Groups group = db.Groups.Where(g => g.id == id).First();
-            //List<GroupMembers> members = group.GroupMembers.Where(m => m.userID != fromId).ToList();
+            Groups group = db.Groups.Where(g => g.id == id).First();
+            List<GroupMembers> members = group.GroupMembers.Where(m => m.userID != fromId).ToList();
 
-            ////foreach (var item in members)
-            //for (int i = 0; i < members.Count; i++)
-            //{
-            //    GroupMembers tmp = members[i];
-            //    if (IsOnline(tmp.User.nickname))
-            //    {
-            //        GroupData gd = new GroupData(group.id, group.name, (string)instr.Data, DateTime.Now);
-            //        Instruction sendInstr = new Instruction(Operation.ReceiveGroupMessage, instr.From, null, gd);
-            //        byte[] data = MyObjectConverter.ObjectToByteArray(sendInstr);
+            //foreach (var item in members)
+            for (int i = 0; i < members.Count; i++)
+            {
+                GroupMembers tmp = members[i];
+                if (IsOnline(tmp.User.nickname))
+                {
+                    GroupData gd = new GroupData(group.id, group.name, (string)instr.Data, DateTime.Now);
+                    Instruction sendInstr = new Instruction(Operation.ReceiveGroupMessage, instr.From, null, gd);
+                    byte[] data = MyObjectConverter.ObjectToByteArray(sendInstr);
 
-            //        NetworkStream s = GetStreamByName(tmp.User.nickname);
-            //        s.WriteAsync(data, 0, data.Length);
-            //        s.WriteAsync(data, 0, data.Length);
-            //    }
-            //}
+                    NetworkStream s = GetStreamByName(tmp.User.nickname);
+                    s.WriteAsync(data, 0, data.Length);
+                    s.WriteAsync(data, 0, data.Length);
+                }
+            }
         }
         private void FriendRequest(string from, string to, NetworkStream stream)
         {

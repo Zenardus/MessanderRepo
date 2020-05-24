@@ -13,9 +13,9 @@ namespace ChatInstruction
     public enum Operation
     {
         PersonalMessage, //+
-        GroupMessage,    //
-        GetMessagesFromGroup, //
-        ReceiveGroupMessage, //
+        GroupMessage,    //+
+        GetMessagesFromGroup, //+
+        ReceiveGroupMessage, //+
         GetMessages,     //+
         GetMessagesFrom, //+
         Friends,       //<<<<<
@@ -30,7 +30,8 @@ namespace ChatInstruction
         AddOnline,     //+
         SearchUser,     //+
         GetFriendRequests,
-        RequestResult
+        RequestResult,
+        GetFile
     }
     //OPERATIONS:
     //        SERVER RECEIVE                               CLIENT RECEIVE

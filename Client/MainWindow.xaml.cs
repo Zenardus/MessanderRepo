@@ -281,7 +281,6 @@ namespace Client
                 frame.NavigationService.Navigate(this.messages);
             }));
         }
-        //<<
         private void PersonalMessage(Instruction instr)
         {
             if (currentPage == CurrentPage.MessagesList)
@@ -312,48 +311,48 @@ namespace Client
                 createGroupWindow = new CreateGroupWindow(stream, login);
             }));
         }
-        //<<
         private void GetMessagesFromGroup(Instruction instr)
         {
-            //this.messages.ClearList();
-            //this.messages.SetIsPersonalMessage(false);
-            //this.messages.SetUser(instr.To);
-            //currentReceiver = instr.To;
-            //this.messages.SetGroupID(int.Parse(instr.From));
-            //List<MessageData> messages = instr.Data as List<MessageData>;
-            //foreach (var item in messages)
-            //{
-            //    if (item.Nickname != login)
-            //        this.messages.AddMessage($"{item.Nickname}: " + item.Message, HorizontalAlignment.Left);
-            //    else
-            //        this.messages.AddMessage(item.Message, HorizontalAlignment.Right);
-            //}
-            //currentPage = CurrentPage.Messages;
-            //frame.Dispatcher.Invoke(new Action(() =>
-            //{
-            //    frame.NavigationService.Navigate(this.messages);
-            //}));
+            this.messages.ClearList();
+            this.messages.SetIsPersonalMessage(false);
+            this.messages.SetUser(instr.To);
+            currentReceiver = instr.To;
+            this.messages.SetGroupID(int.Parse(instr.From));
+            List<MessageData> messages = instr.Data as List<MessageData>;
+            foreach (var item in messages)
+            {
+                if (item.Nickname != login)
+                    this.messages.AddMessage(item, HorizontalAlignment.Left);
+                else
+                    this.messages.AddMessage(item, HorizontalAlignment.Right);
+            }
+            currentPage = CurrentPage.Messages;
+            frame.Dispatcher.Invoke(new Action(() =>
+            {
+                frame.NavigationService.Navigate(this.messages);
+            }));
 
         }
-        //<<
         private void GroupMessage(Instruction instr)
         {
-            //if (currentPage == CurrentPage.Groups)
-            //{
-            //    groupsList.NewMessage(instr.Data as GroupData);
-            //}
-            //else if (currentPage == CurrentPage.Messages && currentReceiver == (instr.Data as GroupData).Name)
-            //{
-            //    messages.AddMessage(instr.From + ": " + (instr.Data as GroupData).LastMessage, HorizontalAlignment.Left);
-            //}
-            //else
-            //{
-            //    textBox_notification.Dispatcher.Invoke(new Action(() =>
-            //    {
-            //        textBox_notification.Text = "";
-            //        textBox_notification.Text = $"you have new message from group: {(instr.Data as GroupData).Name}";
-            //    }));
-            //}
+            if (currentPage == CurrentPage.Groups)
+            {
+                groupsList.NewMessage(instr.Data as GroupData);
+            }
+            else if (currentPage == CurrentPage.Messages && currentReceiver == (instr.Data as GroupData).Name)
+            {
+                GroupData tmp = instr.Data as GroupData;
+                MessageData msg = new MessageData(null, null, instr.From + ":\n" + tmp.LastMessage, tmp.Time);
+                messages.AddMessage(msg, HorizontalAlignment.Left);
+            }
+            else
+            {
+                textBox_notification.Dispatcher.Invoke(new Action(() =>
+                {
+                    textBox_notification.Text = "";
+                    textBox_notification.Text = $"you have new message from group: {(instr.Data as GroupData).Name}";
+                }));
+            }
 
         }
         private void FriendRequest(Instruction instr)
