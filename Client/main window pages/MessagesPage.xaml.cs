@@ -14,6 +14,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Net.Sockets;
 using ChatInstruction;
+using Client.MyControls;
+using System.IO;
+using System.Windows.Forms;
 
 namespace Client
 {
@@ -26,6 +29,9 @@ namespace Client
         NetworkStream stream;
         bool isPersonalMessage;
         int groupID;
+        bool attachment = false;
+        byte[] data;
+        string fileName = "";
 
         public MessagesPage(NetworkStream stream, string from)
         {
@@ -35,23 +41,41 @@ namespace Client
             this.from = from;
 
         }
-        public void AddMessage(string message, HorizontalAlignment aligment)
+        public void AddMessage(MessageData message, System.Windows.HorizontalAlignment aligment)
         {
+            
             listBox_messages.Dispatcher.Invoke(new Action(() =>
             {
-                //TODO: розбивання тексту
-                TextBox b = new TextBox();
-                b.Text = message;
-                b.IsReadOnly = true;
-                b.BorderThickness = new Thickness(0);
-                b.HorizontalAlignment = aligment;
-                b.Background = Brushes.DarkViolet;
-                b.Foreground = Brushes.WhiteSmoke;
-                b.Margin = new Thickness(1);
-                b.Padding = new Thickness(5);
 
-                listBox_messages.Items.Add(b);
-                listBox_messages.ScrollIntoView(b);
+                if (message.Type == MessageType.TextMessage)
+                {
+                    MessageControl msg = new MessageControl((string)message.Message, message.Time.ToShortTimeString());
+                    msg.HorizontalAlignment = aligment;
+                    msg.Margin = new Thickness(1);
+                    listBox_messages.Items.Add(msg);
+                    listBox_messages.ScrollIntoView(msg);
+                }
+                else
+                {
+                    if (((string)message.Message).EndsWith(".jpeg") || ((string)message.Message).EndsWith(".jpg") || ((string)message.Message).EndsWith(".png"))
+                    {
+                        PhotoControl photo = new PhotoControl((string)message.Message, message.Time.ToShortTimeString(), stream);
+                        photo.HorizontalAlignment = aligment;
+                        photo.Margin = new Thickness(1);
+                        listBox_messages.Items.Add(photo);
+                        listBox_messages.ScrollIntoView(photo);
+                    }
+                    else
+                    {
+                        FileControl file = new FileControl((string)message.Message, "", message.Time.ToShortTimeString());
+                        file.HorizontalAlignment = aligment;
+                        file.Margin = new Thickness(1);
+                        listBox_messages.Items.Add(file);
+                        listBox_messages.ScrollIntoView(file);
+                    }
+                }
+
+                
             }));
         }
         public void ClearList()
@@ -79,29 +103,56 @@ namespace Client
 
         private void button_send_Click(object sender, RoutedEventArgs e)
         {
-            if (isPersonalMessage)
+            MessageData message;
+            if (attachment)
             {
-                Instruction instr = new Instruction(Operation.PersonalMessage, from, label_user.Content.ToString(), textBox_message.Text);
-                AddMessage(textBox_message.Text, HorizontalAlignment.Right);
-                textBox_message.Clear();
-                byte[] data = MyObjectConverter.ObjectToByteArray(instr);
-                stream.WriteAsync(data, 0, data.Length);
+                message = new MessageData(null, fileName, data, DateTime.Now, MessageType.File);
             }
             else
             {
-                Instruction instr = new Instruction(Operation.GroupMessage, from, groupID.ToString(), textBox_message.Text);
-                AddMessage(textBox_message.Text, HorizontalAlignment.Right);
+                message = new MessageData(null, null, textBox_message.Text, DateTime.Now, MessageType.TextMessage);
+            }
+            if (isPersonalMessage)
+            {
+                Instruction instr = new Instruction(Operation.PersonalMessage, from, label_user.Content.ToString(), message);
+                //AddMessage(message, System.Windows.HorizontalAlignment.Right);
                 textBox_message.Clear();
                 byte[] data = MyObjectConverter.ObjectToByteArray(instr);
-                stream.Write(data, 0, data.Length);
+                stream.WriteAsync(data, 0, data.Length);
+                if (attachment)
+                {
+                    MessageData disp = new MessageData(null, null, fileName, DateTime.Now, MessageType.File);
+                    AddMessage(disp, System.Windows.HorizontalAlignment.Right);
+                }
+                else
+                {
+                    AddMessage(message, System.Windows.HorizontalAlignment.Right);
+                }
+
             }
+            //if (isPersonalMessage)
+            //{
+            //    Instruction instr = new Instruction(Operation.PersonalMessage, from, label_user.Content.ToString(), textBox_message.Text);
+            //    AddMessage(textBox_message.Text, HorizontalAlignment.Right);
+            //    textBox_message.Clear();
+            //    byte[] data = MyObjectConverter.ObjectToByteArray(instr);
+            //    stream.WriteAsync(data, 0, data.Length);
+            //}
+            //else
+            //{
+            //    Instruction instr = new Instruction(Operation.GroupMessage, from, groupID.ToString(), textBox_message.Text);
+            //    AddMessage(textBox_message.Text, HorizontalAlignment.Right);
+            //    textBox_message.Clear();
+            //    byte[] data = MyObjectConverter.ObjectToByteArray(instr);
+            //    stream.Write(data, 0, data.Length);
+            //}
         }
 
         private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             try
             {
-                if (textBox_message.Text.Trim(' ').Length > 0)
+                if (textBox_message.Text.Trim(' ', '\r', '\n').Length > 0)
                     e.CanExecute = true;
                 else
                     e.CanExecute = false;
@@ -109,6 +160,45 @@ namespace Client
             catch
             {
                 e.CanExecute = false;
+            }
+        }
+
+        private void button_attachment_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            //ofd.Filter = "txt file (*.txt)|*.txt|"
+            //           + "Image files (*.jpg, *.jpeg, *.png) | *.jpg; *.jpeg; *.png";
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                data = File.ReadAllBytes(ofd.FileName);
+                if(!(ofd.SafeFileName.EndsWith(".png") || ofd.SafeFileName.EndsWith(".jpeg") || ofd.SafeFileName.EndsWith(".jpg")))
+                if (data.Length > 1024 * 1024 * 100)
+                {
+                    System.Windows.MessageBox.Show("Файл повинен займати менше 100мб");
+                    data = null;
+                    return;
+                }
+                attachment = true;
+                fileName = ofd.SafeFileName;
+                this.textBox_message.Text = $"[{ofd.SafeFileName}]";
+            }
+
+        }
+
+
+        private void textBox_message_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (attachment && e.Key == Key.Back)
+            {
+                textBox_message.Clear();
+                attachment = false;
+                data = null;
+                fileName = "";
+                e.Handled = true;
+            }
+            else if (attachment)
+            {
+                e.Handled = true;
             }
         }
     }

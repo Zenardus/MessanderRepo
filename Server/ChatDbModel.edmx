@@ -53,9 +53,8 @@
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="fromID" Type="int" Nullable="false" />
           <Property Name="toID" Type="int" Nullable="false" />
-          <Property Name="message" Type="nvarchar(max)" />
-          <Property Name="isImage" Type="bit" Nullable="false" />
-          <Property Name="image" Type="image" />
+          <Property Name="message" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="isFile" Type="bit" Nullable="false" />
           <Property Name="date" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="User">
@@ -300,9 +299,8 @@
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="fromID" Type="Int32" Nullable="false" />
           <Property Name="toID" Type="Int32" Nullable="false" />
-          <Property Name="message" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="isImage" Type="Boolean" Nullable="false" />
-          <Property Name="image" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <Property Name="message" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="isFile" Type="Boolean" Nullable="false" />
           <Property Name="date" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="User" Relationship="Self.FK_From_User" FromRole="Messages" ToRole="User" />
           <NavigationProperty Name="User1" Relationship="Self.FK_To_Messages" FromRole="Messages" ToRole="User" />
@@ -445,7 +443,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="ChatDbEntities" annotation:LazyLoadingEnabled="true">
+        <EntityContainer Name="ChatDBEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="FriendRequest" EntityType="Self.FriendRequest" />
           <EntitySet Name="Friends" EntityType="Self.Friends" />
           <EntitySet Name="GroupMembers" EntityType="Self.GroupMembers" />
@@ -499,7 +497,7 @@
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="Хранилище chatDBModelContainer" CdmEntityContainer="ChatDbEntities">
+        <EntityContainerMapping StorageEntityContainer="Хранилище chatDBModelContainer" CdmEntityContainer="ChatDBEntities">
           <EntitySetMapping Name="FriendRequest">
             <EntityTypeMapping TypeName="chatDBModel.FriendRequest">
               <MappingFragment StoreEntitySet="FriendRequest">
@@ -553,8 +551,7 @@
                 <ScalarProperty Name="fromID" ColumnName="fromID" />
                 <ScalarProperty Name="toID" ColumnName="toID" />
                 <ScalarProperty Name="message" ColumnName="message" />
-                <ScalarProperty Name="isImage" ColumnName="isImage" />
-                <ScalarProperty Name="image" ColumnName="image" />
+                <ScalarProperty Name="isFile" ColumnName="isFile" />
                 <ScalarProperty Name="date" ColumnName="date" />
               </MappingFragment>
             </EntityTypeMapping>

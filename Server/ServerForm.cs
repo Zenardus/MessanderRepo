@@ -13,6 +13,7 @@ using System.Threading;
 using ChatInstruction;
 using System.Runtime.InteropServices;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace Server
 {
@@ -23,9 +24,11 @@ namespace Server
         int serverPort = 1555;
         TcpListener server;
         //---------------БАЗА ДАНИХ
-        ChatDbEntities db = new ChatDbEntities();
+        ChatDBEntities db = new ChatDBEntities();
         //---------------ONLINE USERS
         List<OnlineUsers> online = new List<OnlineUsers>();
+        //---------------counter for files name
+        int counter = 0;
 
 
 
@@ -78,7 +81,7 @@ namespace Server
                 {
                     //try
                     //{
-                        byte[] data = new byte[10240];
+                        byte[] data = new byte[5000000];
                         stream.Read(data, 0, data.Length);
                         Instruction instr = MyObjectConverter.ByteArrayToObject(data) as Instruction;
                         //listBox_log.Invoke(new Action(() =>
@@ -251,7 +254,7 @@ namespace Server
             stream.Write(data, 0, data.Length); //не єбу, що не так, але без цього надсилає через раз
             stream.Write(data, 0, data.Length); //чому з першого разу не відправляє, я не шарю
         }
-        //<<
+        //<< USELESS !!!!!!!! (DELETE)
         private void AddFriend(string from, string to, NetworkStream stream)
         {
             //int fromID = GetUserId(from);
@@ -358,92 +361,133 @@ namespace Server
                 label_online.Text = online.Count.ToString();
             }));
         }
-        //<<
         private void GetMessages(string from, NetworkStream stream)
         {
             //Впевнений, що це не самий оптимальний метод отримати останнє
             //повідомлення від кожного користувача, але я писав цей код в 5:14 ранку
-            //int fromID = GetUserId(from);
+            int fromID = GetUserId(from);
 
-            //User user = db.User.Where(usr => usr.id == fromID).First();
-            //var tmp1 = user.Messages.GroupBy(msg => msg.toID).ToList(); //sended msg
-            //var tmp2 = user.Messages1.GroupBy(msg => msg.fromID).ToList(); //received msg
+            User user = db.User.Where(usr => usr.id == fromID).First();
+            var tmp1 = user.Messages.GroupBy(msg => msg.toID).ToList(); //sended msg
+            var tmp2 = user.Messages1.GroupBy(msg => msg.fromID).ToList(); //received msg
 
-            //List<int> uniqueUser = new List<int>();
-            //foreach (var item in tmp1)
-            //    uniqueUser.Add(item.Key);
-            //foreach (var item in tmp2)
-            //    if (!uniqueUser.Contains(item.Key))
-            //        uniqueUser.Add(item.Key);
+            List<int> uniqueUser = new List<int>();
+            foreach (var item in tmp1)
+                uniqueUser.Add(item.Key);
+            foreach (var item in tmp2)
+                if (!uniqueUser.Contains(item.Key))
+                    uniqueUser.Add(item.Key);
 
-            //List<MessageData> messages = new List<MessageData>();
+            List<MessageData> messages = new List<MessageData>();
 
-            //foreach(var usrID in uniqueUser)
-            //{
-            //    Messages message = db.Messages
-            //        .Where(msg => (msg.fromID == usrID && msg.toID == fromID) || (msg.fromID == fromID && msg.toID == usrID))
-            //        .OrderByDescending(msg => msg.date)
-            //        .First();
-            //    User usr = GetUserById(usrID);
-            //    messages.Add(new MessageData(usr.nickname, $"{usr.surname} {usr.name}", message.message, message.date));
-            //}
+            foreach (var usrID in uniqueUser)
+            {
+                Messages message = db.Messages
+                    .Where(msg => (msg.fromID == usrID && msg.toID == fromID) || (msg.fromID == fromID && msg.toID == usrID))
+                    .OrderByDescending(msg => msg.date)
+                    .First();
+                User usr = GetUserById(usrID);
+                messages.Add(new MessageData(usr.nickname, $"{usr.surname} {usr.name}", message.message, message.date));
+            }
 
-            //messages = messages.OrderBy(msg => msg.Time).ToList();
-            //messages.Reverse();
+            messages = messages.OrderBy(msg => msg.Time).ToList();
+            messages.Reverse();
 
-            //Instruction instr = new Instruction(Operation.GetMessages, null, null, messages);
-            //byte[] data = MyObjectConverter.ObjectToByteArray(instr);
-            //stream.WriteAsync(data, 0, data.Length);
-            //stream.WriteAsync(data, 0, data.Length);
+            Instruction instr = new Instruction(Operation.GetMessages, null, null, messages);
+            byte[] data = MyObjectConverter.ObjectToByteArray(instr);
+            stream.WriteAsync(data, 0, data.Length);
+            stream.WriteAsync(data, 0, data.Length);
         }
-        //<<
         private void GetMessagesFrom(string from, string to, NetworkStream stream)
         {
-            //int fromID = GetUserId(from);
-            //int toID = GetUserId(to);
+            int fromID = GetUserId(from);
+            int toID = GetUserId(to);
 
-            //List<Messages> tmp = db.Messages.Where(msg => (msg.fromID == fromID && msg.toID == toID)
-            //        || (msg.fromID == toID && msg.toID == fromID))
-            //        .ToList();
-            //List<MessageData> messages = new List<MessageData>();
-            //foreach (var msg in tmp)
-            //{
-            //    User usr = GetUserById(msg.fromID);
-            //    messages.Add(new MessageData(usr.nickname, $"{usr.surname} {usr.name}", msg.message, msg.date));
-            //}
-            //messages = messages.OrderBy(msg => msg.Time).ToList();
-            //Instruction instr = new Instruction(Operation.GetMessagesFrom, to, null, messages);
-            //byte[] data = MyObjectConverter.ObjectToByteArray(instr);
-            //stream.WriteAsync(data, 0, data.Length);
-            //stream.WriteAsync(data, 0, data.Length);
+            List<Messages> tmp = db.Messages.Where(msg => (msg.fromID == fromID && msg.toID == toID)
+                    || (msg.fromID == toID && msg.toID == fromID))
+                    .ToList();
+            List<MessageData> messages = new List<MessageData>();
+            foreach (var msg in tmp)
+            {
+                User usr = GetUserById(msg.fromID);
+                if (msg.isFile)
+                {
+                    messages.Add(new MessageData(usr.nickname, $"{usr.surname} {usr.name}", msg.message.Remove(0, msg.message.LastIndexOf("\\") + 1), msg.date, MessageType.File));
+                }
+                else
+                    messages.Add(new MessageData(usr.nickname, $"{usr.surname} {usr.name}", msg.message, msg.date));
+            }
+            messages = messages.OrderBy(msg => msg.Time).ToList();
+            Instruction instr = new Instruction(Operation.GetMessagesFrom, to, null, messages);
+            byte[] data = MyObjectConverter.ObjectToByteArray(instr);
+            stream.WriteAsync(data, 0, data.Length);
+            stream.WriteAsync(data, 0, data.Length);
         }
-        //<<
         private void PersonalMessage(Instruction instruction, NetworkStream strem)
         {
-            //int _fromID = GetUserId(instruction.From);
-            //int _toID = GetUserId(instruction.To);
+            int _fromID = GetUserId(instruction.From);
+            int _toID = GetUserId(instruction.To);
 
-            //User user = GetUserById(_fromID);
+            User user = GetUserById(_fromID);
+            MessageData messageFromClient = instruction.Data as MessageData;
 
-            //Messages msg = new Messages()
-            //{
-            //    fromID = _fromID,
-            //    toID = _toID,
-            //    isImage = false,
-            //    message = (string)instruction.Data,
-            //    date = DateTime.Now
-            //};
-            //db.Messages.Add(msg);
-            //db.SaveChangesAsync();
-            //if (IsOnline(instruction.To))
-            //{
-            //    MessageData m = new MessageData(user.nickname, $"{user.surname} {user.name}", msg.message, DateTime.Now);
-            //    Instruction instr = new Instruction(Operation.PersonalMessage, null, instruction.To, m);
-            //    byte[] data = MyObjectConverter.ObjectToByteArray(instr);
-            //    NetworkStream s = GetStreamByName(instruction.To);
-            //    s.WriteAsync(data, 0, data.Length);
-            //    s.WriteAsync(data, 0, data.Length);
-            //}
+            Messages msg;
+            if (messageFromClient.Type == MessageType.TextMessage)
+            {
+                msg = new Messages()
+                {
+                    fromID = _fromID,
+                    toID = _toID,
+                    isFile = false,
+                    message = (string)messageFromClient.Message,
+                    date = DateTime.Now
+                };
+            }
+            else
+            {
+                // save file
+                string path = @"D:\MessangerDataBaseFiles\" + messageFromClient.Name;
+                while (true)
+                {
+                    if (File.Exists(path))
+                    {
+                        path = path.Insert(path.IndexOf('.') - 1, counter.ToString());
+                        counter++;
+                        continue;
+                    }
+                    else
+                    {
+                        FileStream stream = new FileStream(path, FileMode.Create);
+                        stream.Write((byte[])messageFromClient.Message, 0, ((byte[])messageFromClient.Message).Length);
+                        break;
+                    }
+                }
+                
+                msg = new Messages()
+                {
+                    fromID = _fromID,
+                    toID = _toID,
+                    isFile = true,
+                    message = path,
+                    date = DateTime.Now
+                };
+            }
+            
+            db.Messages.Add(msg);
+            db.SaveChangesAsync();
+            if (IsOnline(instruction.To))
+            {
+                MessageData m;
+                if (messageFromClient.Type == MessageType.TextMessage)
+                    m = new MessageData(user.nickname, $"{user.surname} {user.name}", msg.message, DateTime.Now);
+                else
+                    m = new MessageData(user.nickname, $"{user.surname} {user.name}", messageFromClient.Name, DateTime.Now, MessageType.File);
+                Instruction instr = new Instruction(Operation.PersonalMessage, null, instruction.To, m);
+                byte[] data = MyObjectConverter.ObjectToByteArray(instr);
+                NetworkStream s = GetStreamByName(instruction.To);
+                s.WriteAsync(data, 0, data.Length);
+                s.WriteAsync(data, 0, data.Length);
+            }
 
         }
         private bool IsOnline(string name)
@@ -490,6 +534,7 @@ namespace Server
             stream.WriteAsync(d, 0, d.Length);
             stream.WriteAsync(d, 0, d.Length);
         }
+        //ДОРОБИТИ
         private void GroupsMembers(string from, NetworkStream stream)
         {
             int userID = GetUserId(from);

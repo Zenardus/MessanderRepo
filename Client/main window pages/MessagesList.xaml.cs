@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ChatInstruction;
 using System.Net.Sockets;
+using Client.MyControls;
 
 namespace Client
 {

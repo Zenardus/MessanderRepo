@@ -18,8 +18,7 @@ namespace Server
         public int fromID { get; set; }
         public int toID { get; set; }
         public string message { get; set; }
-        public bool isImage { get; set; }
-        public byte[] image { get; set; }
+        public bool isFile { get; set; }
         public System.DateTime date { get; set; }
     
         public virtual User User { get; set; }

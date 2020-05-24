@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Net.Sockets;
+using ChatInstruction;
 
 namespace Client.MyControls
 {
@@ -20,9 +22,21 @@ namespace Client.MyControls
     /// </summary>
     public partial class PhotoControl : UserControl
     {
-        public PhotoControl()
+        string name;
+        NetworkStream stream;
+
+        public PhotoControl(string name, string time, NetworkStream stream)
         {
             InitializeComponent();
+
+            this.textBlock_Time.Text = time;
+            this.name = name;
+            this.stream = stream;
+        }
+
+        private void Button_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+
         }
     }
 }

@@ -154,12 +154,12 @@ namespace ChatInstruction
     {
         public string Nickname { get; private set; }
         public string Name { get; private set; }
-        public string Message { get; private set; }
+        public object Message { get; private set; }
         public DateTime Time { get; private set; }
         public MessageType Type { get; private set; }
 
 
-        public MessageData(string nickname, string name, string message, DateTime time)
+        public MessageData(string nickname, string name, object message, DateTime time)
         {
             Nickname = nickname;
             Name = name;
@@ -167,6 +167,16 @@ namespace ChatInstruction
             Time = time;
             Type = MessageType.TextMessage;
         }
+        public MessageData(string nickname, string name, object message, DateTime time, MessageType type)
+        {
+            Nickname = nickname;
+            Name = name;
+            Message = message;
+            Time = time;
+            Type = type;
+        }
+
+
         public override string ToString()
         {
             return $"{Name} [{Nickname}]\n{Message}\n{Time}";

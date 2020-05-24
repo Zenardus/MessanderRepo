@@ -9,7 +9,7 @@
     <Grid>
         <Rectangle  Fill="DarkViolet" RadiusX="10" RadiusY="10"/>
         <Image Name="image_content" Margin="5 5 5 14" Source="C:\Users\MS-DWL\Downloads\Background.png"/>
-        <Button Opacity="0" Margin="5 5 5 14" />
+        <Button Opacity="0" Margin="5 5 5 14" MouseLeftButtonDown="Button_MouseLeftButtonDown"/>
         <TextBlock Name="textBlock_Time" Text="17:15" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10 0" Foreground="Black" FontSize="11"/>
     </Grid>
 </UserControl>

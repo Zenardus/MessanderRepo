@@ -86,8 +86,6 @@ namespace Client
                 {
                     this.Close();
                 }
-                
-
             } else
             {
                 System.Windows.MessageBox.Show("Сервер не відповідає\nСпробуйте пізніше");
@@ -173,7 +171,7 @@ namespace Client
             {
                 while (true)
                 {
-                    byte[] data = new byte[10240];
+                    byte[] data = new byte[5000000];
                     stream.Read(data, 0, data.Length);
                     Instruction instr = MyObjectConverter.ByteArrayToObject(data) as Instruction;
                     InstructionHandler(instr);
@@ -245,7 +243,7 @@ namespace Client
         {
             addFriend.SetList(instr.Data as List<UserData>);
         }
-        //<<
+        //<< USELESS !!!!!!!!!! (DELETE)
         private void AddFriend(Instruction instr)
         {
             //if ((bool)instr.Data)
@@ -259,49 +257,47 @@ namespace Client
         {
             friends.SetList(instr.Data as List<UserData>);
         }
-        //<<
         private void GetMessages(Instruction instr)
         {
-            //messagesList.SetList(instr.Data as List<MessageData>);
+            messagesList.SetList(instr.Data as List<MessageData>);
         }
-        //<<
         private void GetMessagesFrom(Instruction instr)
         {
-            //currentReceiver = instr.From;
-            //List<MessageData> messages = instr.Data as List<MessageData>;
-            //this.messages.ClearList();
-            //this.messages.SetIsPersonalMessage(true);
-            //this.messages.SetUser(instr.From);
-            //foreach(var item in messages)
-            //{
-            //    if (item.Nickname == instr.From)
-            //        this.messages.AddMessage(item.Message, HorizontalAlignment.Left);
-            //    else
-            //        this.messages.AddMessage(item.Message, HorizontalAlignment.Right);
-            //}
-            //currentPage = CurrentPage.Messages;
-            //frame.Dispatcher.Invoke(new Action(() =>
-            //{
-            //    frame.NavigationService.Navigate(this.messages);
-            //}));
+            currentReceiver = instr.From;
+            List<MessageData> messages = instr.Data as List<MessageData>;
+            this.messages.ClearList();
+            this.messages.SetIsPersonalMessage(true);
+            this.messages.SetUser(instr.From);
+            foreach (var item in messages)
+            {
+                if (item.Nickname == instr.From)
+                    this.messages.AddMessage(item, HorizontalAlignment.Left);
+                else
+                    this.messages.AddMessage(item, HorizontalAlignment.Right);
+            }
+            currentPage = CurrentPage.Messages;
+            frame.Dispatcher.Invoke(new Action(() =>
+            {
+                frame.NavigationService.Navigate(this.messages);
+            }));
         }
         //<<
         private void PersonalMessage(Instruction instr)
         {
-            //if (currentPage == CurrentPage.MessagesList)
-            //{
-            //    messagesList.NewMessage(instr.Data as MessageData);
-            //}
-            //else if (currentPage == CurrentPage.Messages && currentReceiver == (instr.Data as MessageData).Nickname)
-            //{
-            //    messages.AddMessage((instr.Data as MessageData).Message, HorizontalAlignment.Left);
-            //}
-            //else
-            //    textBox_notification.Dispatcher.Invoke(new Action(() =>
-            //    {
-            //        textBox_notification.Text = "";
-            //        textBox_notification.Text = $"you have new message from {(instr.Data as MessageData).Nickname}";
-            //    }));
+            if (currentPage == CurrentPage.MessagesList)
+            {
+                messagesList.NewMessage(instr.Data as MessageData);
+            }
+            else if (currentPage == CurrentPage.Messages && currentReceiver == (instr.Data as MessageData).Nickname)
+            {
+                messages.AddMessage((instr.Data as MessageData), HorizontalAlignment.Left);
+            }
+            else
+                textBox_notification.Dispatcher.Invoke(new Action(() =>
+                {
+                    textBox_notification.Text = "";
+                    textBox_notification.Text = $"you have new message from {(instr.Data as MessageData).Nickname}";
+                }));
         }
         private void Groups(Instruction instr)
         {

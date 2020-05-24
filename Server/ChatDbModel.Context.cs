@@ -13,10 +13,10 @@ namespace Server
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class ChatDbEntities : DbContext
+    public partial class ChatDBEntities : DbContext
     {
-        public ChatDbEntities()
-            : base("name=ChatDbEntities")
+        public ChatDBEntities()
+            : base("name=ChatDBEntities")
         {
         }
     

@@ -20,9 +20,12 @@ namespace Client.MyControls
     /// </summary>
     public partial class MessageControl : UserControl
     {
-        public MessageControl()
+        public MessageControl(string message, string time)
         {
             InitializeComponent();
+
+            this.textBlock_Message.Text = message;
+            this.textBlock_Time.Text = time;
         }
     }
 }

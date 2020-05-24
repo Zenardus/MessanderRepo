@@ -20,9 +20,13 @@ namespace Client.MyControls
     /// </summary>
     public partial class FileControl : UserControl
     {
-        public FileControl()
+        public FileControl(string name, string size, string time)
         {
             InitializeComponent();
+
+            textBlock_Name.Text = name;
+            textBlock_Size.Text = size;
+            textBlock_Time.Text = time;
         }
     }
 }
