@@ -180,6 +180,9 @@ namespace Server
                 case Operation.RequestResult:
                     RequestResult(instruction, stream);
                     break;
+                case Operation.GetFile:
+                    GetFile(instruction, stream);
+                    break;
             }
             
         }
@@ -459,6 +462,7 @@ namespace Server
                     {
                         FileStream stream = new FileStream(path, FileMode.Create);
                         stream.Write((byte[])messageFromClient.Message, 0, ((byte[])messageFromClient.Message).Length);
+                        stream.Close();
                         break;
                     }
                 }
@@ -711,6 +715,26 @@ namespace Server
                     );
                 db.SaveChangesAsync();
             }
+        }
+        private void GetFile(Instruction instr, NetworkStream stream)
+        {
+            try
+            {
+                Messages message = db.Messages.Where(msg => (msg.isFile == true) && (msg.message.EndsWith(instr.From))).First();
+                FileStream file = new FileStream(message.message, FileMode.Open);
+                byte[] fileData = new byte[file.Length];
+                file.Read(fileData, 0, fileData.Length);
+                Instruction sendInstr = new Instruction(Operation.GetFile, instr.From, instr.To, (object)fileData);
+
+                byte[] instrData = MyObjectConverter.ObjectToByteArray(sendInstr);
+                stream.WriteAsync(instrData, 0, instrData.Length);
+                stream.WriteAsync(instrData, 0, instrData.Length);
+            }
+            catch
+            {
+
+            }
+
         }
 
         //DB GET METHODS

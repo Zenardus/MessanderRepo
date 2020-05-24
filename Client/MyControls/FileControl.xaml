@@ -7,6 +7,11 @@
              mc:Ignorable="d" 
              MinWidth="175">
     <Grid>
+        <ContextMenuService.ContextMenu>
+            <ContextMenu>
+                <MenuItem Header="Download" Click="MenuItem_Click"/>
+            </ContextMenu>
+        </ContextMenuService.ContextMenu>
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition/>

@@ -237,6 +237,9 @@ namespace Client
                 case Operation.GetFriendRequests:
                     GetFriendRequests(instruction);
                     break;
+                case Operation.GetFile:
+                    GetFile(instruction);
+                    break;
             }
         }
         private void SearchedUser(Instruction instr)
@@ -366,6 +369,25 @@ namespace Client
         private void GetFriendRequests(Instruction instr)
         {
             requests.SetList(instr.Data as List<UserData>);
+        }
+        private void GetFile(Instruction instr)
+        {
+            try
+            {
+                System.IO.FileStream file = new System.IO.FileStream(instr.To, System.IO.FileMode.Create);
+                byte[] data = (byte[])instr.Data;
+                file.Write(data, 0, data.Length);
+                file.Close();
+                textBox_notification.Dispatcher.Invoke(new Action(() =>
+                {
+                    textBox_notification.Clear();
+                    textBox_notification.Text = "file loaded";
+                }));
+            }
+            catch
+            {
+
+            }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

@@ -74,7 +74,7 @@ namespace Client
                     }
                     else
                     {
-                        FileControl file = new FileControl((string)message.Message, "", message.Time.ToShortTimeString());
+                        FileControl file = new FileControl((string)message.Message, "", message.Time.ToShortTimeString(), stream);
                         file.HorizontalAlignment = aligment;
                         file.Margin = new Thickness(1);
                         listBox_messages.Items.Add(file);
@@ -199,6 +199,20 @@ namespace Client
             {
                 e.Handled = true;
             }
+        }
+
+        private void CommandBinding_CanExecute_1(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if (isPersonalMessage)
+                e.CanExecute = true;
+            else
+                e.CanExecute = false;
+        }
+
+        private void listBox_messages_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            listBox_messages.UnselectAll();
+            e.Handled = true;
         }
     }
 }
