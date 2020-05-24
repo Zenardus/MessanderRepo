@@ -173,8 +173,19 @@ namespace Client
                 {
                     byte[] data = new byte[5000000];
                     stream.Read(data, 0, data.Length);
-                    Instruction instr = MyObjectConverter.ByteArrayToObject(data) as Instruction;
-                    InstructionHandler(instr);
+                    Instruction instr;
+                    try
+                    {
+                        instr = MyObjectConverter.ByteArrayToObject(data) as Instruction;
+                        InstructionHandler(instr);
+
+
+                    }
+                    catch
+                    {
+
+                    }
+
                 }
             }
             catch(Exception)
@@ -379,20 +390,20 @@ namespace Client
                     MyControls.PhotoControl photo = messages.GetPhoto(instr.From);
                     if (photo != null)
                     {
-                        //System.Drawing.ImageConverter converter = new System.Drawing.ImageConverter();
-                        //photo.Dispatcher.Invoke(new Action(() =>
-                        //{
-                        //    BitmapImage biImg = new BitmapImage();
-                        //    System.IO.MemoryStream ms = new System.IO.MemoryStream((byte[])instr.Data);
-                        //    biImg.BeginInit();
-                        //    biImg.StreamSource = ms;
-                        //    biImg.EndInit();
+                        System.Drawing.ImageConverter converter = new System.Drawing.ImageConverter();
+                        photo.Dispatcher.Invoke(new Action(() =>
+                        {
+                            BitmapImage biImg = new BitmapImage();
+                            System.IO.MemoryStream ms = new System.IO.MemoryStream((byte[])instr.Data);
+                            biImg.BeginInit();
+                            biImg.StreamSource = ms;
+                            biImg.EndInit();
 
-                        //    ImageSource imgSrc = biImg as ImageSource;
-                        //    photo.SetImage(imgSrc);
-                            
-                        //}));
-                        
+                            ImageSource imgSrc = biImg as ImageSource;
+                            photo.SetImage(imgSrc);
+
+                        }));
+
                     }
                 }
                 else

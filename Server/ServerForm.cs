@@ -724,15 +724,15 @@ namespace Server
             try
             {
                 Messages message = db.Messages.Where(msg => (msg.isFile == true) && (msg.message.EndsWith(instr.From))).First();
-
+                //string p = @"C:\Users\Public\Pictures\Sample Pictures\Hydrangeas.jpg";
                 byte[] data = File.ReadAllBytes(message.message);
-                MessageData tmp = new MessageData("none", "none", data, DateTime.MinValue);
+                //MessageData tmp = new MessageData("none", "none", data, DateTime.MinValue);
 
-                Instruction sendInstr = new Instruction(Operation.GetFile, instr.From, instr.To, tmp);
+                Instruction sendInstr = new Instruction(Operation.GetFile, instr.From, instr.To, data);
 
                 byte[] instrData = MyObjectConverter.ObjectToByteArray(sendInstr);
-                stream.WriteAsync(instrData, 0, instrData.Length);
-                stream.WriteAsync(instrData, 0, instrData.Length);
+                stream.Write(instrData, 0, instrData.Length);
+                stream.Write(instrData, 0, instrData.Length);
 
             }
             catch

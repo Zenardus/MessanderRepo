@@ -20,14 +20,6 @@
         <TextBlock Name="textBlock_Name" Text="example.txt" Margin="55 5 15 0" FontWeight="Bold" FontSize="13" Foreground="WhiteSmoke"/>
         <TextBlock Name="textBlock_Size" Text="25 MB" Grid.Row="1" Margin="55 0 15 12" FontSize="11" Foreground="WhiteSmoke"/>
         <TextBlock Name="textBlock_Time" Text="17:05" Grid.Row="1" Margin="0 5 17 0" FontSize="11" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
-        <Label Grid.RowSpan="2" Width="35" Height="35" HorizontalAlignment="Left" Margin="14 0" >
-            <Label.Background>
-                <ImageBrush Stretch="UniformToFill">
-                    <ImageBrush.ImageSource>
-                        <BitmapImage UriSource="file:///C:/Users/MS-DWL/Desktop/file2.png"/>
-                    </ImageBrush.ImageSource>
-                </ImageBrush>
-            </Label.Background>
-        </Label>
+        <Image Grid.RowSpan="2" Width="55" Height="35" HorizontalAlignment="Left" Margin="5 0 0 0" Source="C:\Users\MS-DWL\Documents\Visual Studio 2015\Projects\TCPchat_exam\Client\bin\Debug\images\file2.png" Stretch="Fill"/>
     </Grid>
 </UserControl>

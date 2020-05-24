@@ -220,7 +220,8 @@ namespace Client
                 try
                 {
                     PhotoControl photo = item as PhotoControl;
-                    return photo;
+                    if (photo.Name == name)
+                        return photo;
                 }
                 catch
                 {

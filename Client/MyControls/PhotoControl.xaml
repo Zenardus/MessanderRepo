@@ -5,10 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Client.MyControls"
              mc:Ignorable="d" 
-             MaxHeight="200">
+             MaxHeight="200"
+             MinHeight="150">
     <Grid>
         <Rectangle  Fill="DarkViolet" RadiusX="10" RadiusY="10"/>
-        <Image Name="image_content" Margin="5 5 5 14" Source="C:\Users\MS-DWL\Downloads\Background.png"/>
+        <Image Name="image_content" Margin="5 5 5 14" Source="C:\Users\MS-DWL\Documents\Visual Studio 2015\Projects\TCPchat_exam\Client\bin\Debug\images\Background.png" Stretch="UniformToFill"/>
         <Button Name="button_click" Opacity="0" Margin="5 5 5 14" Click="Button_Click" Cursor="Hand"/>
         <TextBlock Name="textBlock_Time" Text="17:15" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10 0" Foreground="Black" FontSize="11"/>
     </Grid>
