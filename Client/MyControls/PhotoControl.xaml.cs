@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Net.Sockets;
 using ChatInstruction;
+using System.Drawing;
 
 namespace Client.MyControls
 {
@@ -22,7 +23,7 @@ namespace Client.MyControls
     /// </summary>
     public partial class PhotoControl : UserControl
     {
-        string name;
+        public string Name { get; private set; }
         NetworkStream stream;
 
         public PhotoControl(string name, string time, NetworkStream stream)
@@ -30,13 +31,21 @@ namespace Client.MyControls
             InitializeComponent();
 
             this.textBlock_Time.Text = time;
-            this.name = name;
+            Name = name;
             this.stream = stream;
         }
 
-        private void Button_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
 
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Instruction instr = new Instruction(Operation.GetFile, Name, "image", null);
+            byte[] data = MyObjectConverter.ObjectToByteArray(instr);
+            stream.Write(data, 0, data.Length);
         }
+        public void SetImage(ImageSource img)
+        {
+            image_content.Source = img;
+        }
+
     }
 }

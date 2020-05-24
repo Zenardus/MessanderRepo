@@ -184,7 +184,6 @@ namespace Client
 
         }
 
-
         private void textBox_message_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (attachment && e.Key == Key.Back)
@@ -213,6 +212,23 @@ namespace Client
         {
             listBox_messages.UnselectAll();
             e.Handled = true;
+        }
+        public PhotoControl GetPhoto(string name)
+        {
+            foreach (var item in listBox_messages.Items)
+            {
+                try
+                {
+                    PhotoControl photo = item as PhotoControl;
+                    return photo;
+                }
+                catch
+                {
+
+                }
+            }
+            return null;
+
         }
     }
 }

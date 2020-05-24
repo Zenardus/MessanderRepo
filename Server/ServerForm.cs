@@ -14,6 +14,7 @@ using ChatInstruction;
 using System.Runtime.InteropServices;
 using System.Collections.ObjectModel;
 using System.IO;
+//using System.Windows.Media.Imaging;
 
 namespace Server
 {
@@ -29,6 +30,8 @@ namespace Server
         List<OnlineUsers> online = new List<OnlineUsers>();
         //---------------counter for files name
         int counter = 0;
+        //---------------path to save files
+        string savePath = @"D:\MessangerDataBaseFiles\";
 
 
 
@@ -449,7 +452,7 @@ namespace Server
             else
             {
                 // save file
-                string path = @"D:\MessangerDataBaseFiles\" + messageFromClient.Name;
+                string path = savePath + messageFromClient.Name;
                 while (true)
                 {
                     if (File.Exists(path))
@@ -721,14 +724,16 @@ namespace Server
             try
             {
                 Messages message = db.Messages.Where(msg => (msg.isFile == true) && (msg.message.EndsWith(instr.From))).First();
-                FileStream file = new FileStream(message.message, FileMode.Open);
-                byte[] fileData = new byte[file.Length];
-                file.Read(fileData, 0, fileData.Length);
-                Instruction sendInstr = new Instruction(Operation.GetFile, instr.From, instr.To, (object)fileData);
+
+                byte[] data = File.ReadAllBytes(message.message);
+                MessageData tmp = new MessageData("none", "none", data, DateTime.MinValue);
+
+                Instruction sendInstr = new Instruction(Operation.GetFile, instr.From, instr.To, tmp);
 
                 byte[] instrData = MyObjectConverter.ObjectToByteArray(sendInstr);
                 stream.WriteAsync(instrData, 0, instrData.Length);
                 stream.WriteAsync(instrData, 0, instrData.Length);
+
             }
             catch
             {

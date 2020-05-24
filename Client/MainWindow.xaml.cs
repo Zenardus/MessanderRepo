@@ -17,7 +17,7 @@ using System.Net.Sockets;
 using System.Net;
 using ChatInstruction;
 using System.Collections.ObjectModel;
-//using System.Windows.Forms;
+
 
 
 namespace Client
@@ -374,15 +374,39 @@ namespace Client
         {
             try
             {
-                System.IO.FileStream file = new System.IO.FileStream(instr.To, System.IO.FileMode.Create);
-                byte[] data = (byte[])instr.Data;
-                file.Write(data, 0, data.Length);
-                file.Close();
-                textBox_notification.Dispatcher.Invoke(new Action(() =>
+                if (instr.To == "image")
                 {
-                    textBox_notification.Clear();
-                    textBox_notification.Text = "file loaded";
-                }));
+                    MyControls.PhotoControl photo = messages.GetPhoto(instr.From);
+                    if (photo != null)
+                    {
+                        //System.Drawing.ImageConverter converter = new System.Drawing.ImageConverter();
+                        //photo.Dispatcher.Invoke(new Action(() =>
+                        //{
+                        //    BitmapImage biImg = new BitmapImage();
+                        //    System.IO.MemoryStream ms = new System.IO.MemoryStream((byte[])instr.Data);
+                        //    biImg.BeginInit();
+                        //    biImg.StreamSource = ms;
+                        //    biImg.EndInit();
+
+                        //    ImageSource imgSrc = biImg as ImageSource;
+                        //    photo.SetImage(imgSrc);
+                            
+                        //}));
+                        
+                    }
+                }
+                else
+                {
+                    System.IO.FileStream file = new System.IO.FileStream(instr.To, System.IO.FileMode.Create);
+                    byte[] data = (byte[])instr.Data;
+                    file.Write(data, 0, data.Length);
+                    file.Close();
+                    textBox_notification.Dispatcher.Invoke(new Action(() =>
+                    {
+                        textBox_notification.Clear();
+                        textBox_notification.Text = "file loaded";
+                    }));
+                }
             }
             catch
             {
